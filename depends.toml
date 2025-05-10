@@ -1,0 +1,31 @@
+[versions]
+shadow = "9.0.0-beta13"
+kotlin = "2.1.20"
+paper = "1.21.5-R0.1-SNAPSHOT"
+coroutines = "1.10.2"
+serialization = "1.8.0"
+runpaper = "2.3.1"
+vault = "1.7.1"
+luckperms = "5.4"
+userdev = "2.0.0-beta.16"
+lands = "7.15.4"
+ktoml = "0.6.0"
+
+[libraries]
+serial-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }
+serial-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+serial-ktoml = { module = "com.akuleshov7:ktoml-core", version.ref = "ktoml" }
+paper = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+vault = { module = "com.github.Milkbowl:VaultAPI", version.ref = "vault" }
+luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
+lands = { module = "com.github.angeschossen:LandsAPI", version.ref = "lands" }
+
+[bundles]
+serialization = ["serial-core", "serial-json", "serial-ktoml"]
+
+[plugins]
+userdev = { id = "io.papermc.paperweight.userdev", version.ref = "userdev" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+runpaper = { id = "xyz.jpenilla.run-paper", version.ref = "runpaper" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
