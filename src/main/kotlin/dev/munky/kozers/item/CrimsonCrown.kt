@@ -15,6 +15,8 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.block.BlockType
+import org.bukkit.damage.DamageSource
+import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -69,7 +71,7 @@ object CrimsonCrown : KItem() {
     const val BLEED_RADIUS = 7.5 // 15 block aoe
     const val BLEED_RATIO = 0.08 // eight percent of health
     const val BEARER_BLEED_RATIO = 0.02
-    const val MAX_BLEED_DAMAGE = 1000.0 // you can damage any number of entities a total of 1000 times
+    const val MAX_BLEED_DAMAGE = 1000.0
 
     val BLEED_PARTICLE = ParticleBuilder(Particle.FALLING_DUST)
         .extra(.0)
@@ -89,7 +91,7 @@ object CrimsonCrown : KItem() {
     init {
         CoroutineScope(Dispatchers.Munky).launch {
             while (isActive) {
-                delayTicks(15)
+                delayTicks(30)
                 val crownBearers = Bukkit.getOnlinePlayers()
                     .associateWith { it.equipment.helmet }
                     .filterValues {
@@ -105,8 +107,12 @@ object CrimsonCrown : KItem() {
                         bearer.health -= (bearer.health * BEARER_BLEED_RATIO)
                         playSoundAndParticles(bearer)
                         for (near in nearby) {
+                            val damageSource = DamageSource.builder(DamageType.INDIRECT_MAGIC)
+                                .withCausingEntity(bearer)
+                                .withDamageLocation(near.location)
+                                .build()
                             val toDamage = near.health * BLEED_RATIO
-                            near.damage(toDamage, bearer)
+                            near.damage(toDamage, damageSource)
                             damage += toDamage
                             playSoundAndParticles(near)
                         }

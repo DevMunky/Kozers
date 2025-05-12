@@ -6,6 +6,7 @@ import dev.munky.kozers.util.logger
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import java.io.File
 import java.util.*
 
 class ConfigManager : DataManager<TheConfig>("config.json", false, { Json }) {
@@ -18,7 +19,7 @@ class ConfigManager : DataManager<TheConfig>("config.json", false, { Json }) {
         logger.info("Loaded config")
     }
 
-    fun get(): TheConfig = e2file.keys.firstOrNull() ?: TheConfig.default().also { e2file.keys.add(it) }
+    fun get(): TheConfig = e2file.keys.firstOrNull() ?: TheConfig.default().also { e2file[it] = file }
 
     companion object {
         private val logger = logger<TheConfig>()

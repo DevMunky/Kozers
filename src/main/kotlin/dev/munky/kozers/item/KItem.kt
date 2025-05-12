@@ -4,6 +4,8 @@ import dev.munky.kozers.KozersPlugin
 import dev.munky.kozers.util.*
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.util.Tick
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
@@ -121,7 +123,7 @@ abstract class KItem {
     }
 
     fun createItem(): ItemStack {
-        val i = ItemStack.of(Material.COD)
+        val i = ItemStack.of(Material.COOKIE)
         i.editPersistentDataContainer {
             it.set(PDC_KEY, PersistentDataType, this)
         }
@@ -163,7 +165,11 @@ abstract class KItem {
 
         val ITEMS = listOf( // just for commands. Actual KItems do a class lookup to get the instance.
             Ambrosia::class,
-            CrimsonCrown::class
+            CrimsonCrown::class,
+            LuckyShoes::class,
+            ReesesCup::class,
+            ShouldNotEatButProbablyWill::class,
+            ExplosiveWindCharge::class
         )
 
         fun getKItem(item: ItemStack): KItem? {
