@@ -1,6 +1,7 @@
 package dev.munky.kozers.command
 
 import com.mojang.brigadier.tree.LiteralCommandNode
+import dev.munky.kozers.util.asComponent
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
@@ -13,6 +14,20 @@ import org.bukkit.entity.Player
 object WorldCommand : Command {
     override fun build(): LiteralCommandNode<CommandSourceStack> = Commands.literal("world")
         .then(Commands
+            .literal("debug")
+            .executes {
+                val sender = it.source.sender
+                if (sender !is Player) Command.fail("Must be a player to run this command")
+
+                sender.sendMessage("""
+                    World: ${sender.world.name}
+                    Location: ${sender.location.toVector()}
+                """.trimIndent().asComponent)
+
+                Command.SINGLE_SUCCESS
+            }
+        )
+        .then(Commands
             .literal("tp")
             .then(Commands
                 .argument("world", ArgumentTypes.world())
@@ -23,7 +38,7 @@ object WorldCommand : Command {
                     val world = it.getArgument("world", World::class.java)
                     val position = world.spawnLocation
 
-                    sender.sendMessage("<green>Teleported to ${position.toVector()} in world ${world.name}")
+                    sender.sendMessage("<green>Teleported to ${position.toVector()} in world ${world.name}".asComponent)
                     sender.teleport(position)
 
                     Command.SINGLE_SUCCESS
@@ -37,7 +52,7 @@ object WorldCommand : Command {
                         val world = it.getArgument("world", World::class.java)
                         val position = it.getArgument("position", FinePositionResolver::class.java).resolve(it.source)
 
-                        sender.sendMessage("<green>Teleported to ${position.toVector()} in world ${world.name}")
+                        sender.sendMessage("<green>Teleported to ${position.toVector()} in world ${world.name}".asComponent)
                         sender.teleport(Location(world, position.x(), position.y(), position.z()))
 
                         Command.SINGLE_SUCCESS
@@ -52,7 +67,7 @@ object WorldCommand : Command {
                         val position = world.spawnLocation
                         val target = it.getArgument("player1", Player::class.java)
 
-                        sender.sendMessage("<green>Teleported '${target.name}' to ${position.toVector()} in world ${world.name}")
+                        sender.sendMessage("<green>Teleported '${target.name}' to ${position.toVector()} in world ${world.name}".asComponent)
                         target.teleport(Location(world, position.x(), position.y(), position.z()))
 
                         Command.SINGLE_SUCCESS
@@ -67,7 +82,7 @@ object WorldCommand : Command {
                             val position = it.getArgument("position", FinePositionResolver::class.java).resolve(it.source)
                             val target = it.getArgument("player1", Player::class.java)
 
-                            sender.sendMessage("<green>Teleported '${target.name}' to ${position.toVector()} in world ${world.name}")
+                            sender.sendMessage("<green>Teleported '${target.name}' to ${position.toVector()} in world ${world.name}".asComponent)
                             target.teleport(Location(world, position.x(), position.y(), position.z()))
 
                             Command.SINGLE_SUCCESS

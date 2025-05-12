@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.asCoroutineDispatcher
+import net.minecraft.server.MinecraftServer
 import org.bukkit.Bukkit
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -38,18 +39,18 @@ object MunkyDispatcher: CoroutineDispatcher() {
     override fun dispatch(context: CoroutineContext, block: Runnable) = dispatcher.dispatch(context, block)
 }
 
+/**
+ * For context switching to the main thread.
+ *
+ * For some reason minecraft stops scheduling when the server is shutting down
+ * and just ___runs tasks on the caller thread___.
+ */
 object SyncDispatcher: CoroutineDispatcher() {
     private val logger = logger<SyncDispatcher>()
 
     override fun isDispatchNeeded(context: CoroutineContext): Boolean = !Bukkit.isPrimaryThread()
-
     override fun dispatch(context: CoroutineContext, block: Runnable) {
-        when {
-            !plugin.isEnabled -> logger.error("Cannot dispatch if Kozers is disabled ($block)")
-            Bukkit.isPrimaryThread() -> Dispatchers.Unconfined.dispatch(context, block)
-            else -> Bukkit.getGlobalRegionScheduler().run(plugin) {
-                block.run()
-            }
-        }
+        if (!isDispatchNeeded(context)) Dispatchers.Unconfined.dispatch(context, block)
+        else MinecraftServer.getServer().execute(block)
     }
 }

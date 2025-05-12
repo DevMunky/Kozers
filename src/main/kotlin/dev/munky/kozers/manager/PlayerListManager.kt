@@ -18,18 +18,29 @@ import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import java.io.Closeable
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 typealias TabListEntry = ClientboundPlayerInfoUpdatePacket.Entry
 typealias TabListPacket = ClientboundPlayerInfoUpdatePacket
 typealias TabListAction = ClientboundPlayerInfoUpdatePacket.Action
 
 class PlayerListManager : Closeable {
-    var isAlive = true
     private val scope = CoroutineScope(Dispatchers.Munky)
 
     private val loop = scope.launch {
-        while (isAlive) {
-            delay(1.ticks)
+        var spark: Spark? = null
+        while (isActive) {
+            try {
+                spark = SparkProvider.get()
+                break
+            } catch (t: IllegalStateException) { // ignored
+                delayTicks(20)
+            }
+        }
+        spark!!
+        while (isActive) {
+            // dont do delayTicks here because we want more updated information when tps is low
+            delay(25.milliseconds)
             val players = withContext(Dispatchers.Sync) {
                 Bukkit.getOnlinePlayers()
             }
@@ -37,9 +48,9 @@ class PlayerListManager : Closeable {
                 player.sendPlayerListHeader("<gray>Welcome to <yellow>Kozers</yellow>!".asComponent)
                 player.sendPlayerListFooter("""
                     <blue>Ping: <white>${player.ping}ms
-                    <green>TPS: ${SparkProvider.get().tps()?.poll(StatisticWindow.TicksPerSecond.SECONDS_10).toString().take(7)}
-                    <yellow>MSPT: ${SparkProvider.get().mspt()?.poll(StatisticWindow.MillisPerTick.SECONDS_10)!!.mean().toString().take(7)}ms
-                    <red>CPU: ${SparkProvider.get().cpuProcess().poll(StatisticWindow.CpuUsage.SECONDS_10).toString().take(7)}%
+                    <green>TPS: ${spark.tps()?.poll(StatisticWindow.TicksPerSecond.SECONDS_10).toString().take(7)}
+                    <yellow>MSPT: ${spark.mspt()?.poll(StatisticWindow.MillisPerTick.SECONDS_10)!!.mean().toString().take(7)}ms
+                    <red>CPU: ${spark.cpuProcess().poll(StatisticWindow.CpuUsage.SECONDS_10).toString().take(7)}%
                     <green>RAM: ${(((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()).toDouble() / Runtime.getRuntime().maxMemory()) * 100).toString().take(7)}%
                     """.trimIndent().asComponent)
             }
@@ -56,7 +67,7 @@ class PlayerListManager : Closeable {
 
     private val updateLoop = scope.launch {
         return@launch
-        while (isAlive) {
+        while (isActive) {
             delay(1.ticks)
             val players = withContext(Dispatchers.Sync) {
                 ArrayList(Bukkit.getOnlinePlayers())

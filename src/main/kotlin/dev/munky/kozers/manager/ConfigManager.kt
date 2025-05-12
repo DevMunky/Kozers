@@ -11,11 +11,14 @@ import java.util.*
 class ConfigManager : DataManager<TheConfig>("config.json", false, { Json }) {
     override val serializer: KSerializer<TheConfig> = TheConfig.serializer()
 
+    private var configDecoded = false
     override fun onDecode(value: TheConfig) {
+        if (configDecoded) error("No more than one config.json allowed.")
+        configDecoded = true
         logger.info("Loaded config")
     }
 
-    fun get(): TheConfig = e2file.keys.first()
+    fun get(): TheConfig = e2file.keys.firstOrNull() ?: TheConfig.default().also { e2file.keys.add(it) }
 
     companion object {
         private val logger = logger<TheConfig>()
@@ -25,7 +28,11 @@ class ConfigManager : DataManager<TheConfig>("config.json", false, { Json }) {
 @Serializable
 data class TheConfig(
     val worldGroups: List<WorldGroup>
-)
+) {
+    companion object {
+        fun default() = TheConfig(emptyList())
+    }
+}
 
 @Serializable
 data class WorldGroup(

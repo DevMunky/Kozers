@@ -4,14 +4,11 @@ import dev.munky.kozers.command.KItemCommand
 import dev.munky.kozers.command.ReloadCommand
 import dev.munky.kozers.command.WorldCommand
 import dev.munky.kozers.manager.*
-import dev.munky.kozers.serialization.Json
-import dev.munky.kozers.serialization.Toml
 import dev.munky.kozers.util.logger
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import kotlinx.coroutines.runBlocking
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.UUID
 import java.util.logging.Logger
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -19,6 +16,9 @@ import kotlin.reflect.KProperty
 class KozersPlugin : JavaPlugin() {
     init {
         plugin = this
+        // Terra isn't fully updated for 1.21.5
+        // Seems to work, will note issues here.
+        System.setProperty("IKnowThereAreNoNMSBindingsForv1_21_5ButIWillProceedAnyway", "true")
     }
 
     override fun getLogger(): Logger = object: Logger("Kozers", null) {

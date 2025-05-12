@@ -9,6 +9,7 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.*
 import org.jetbrains.annotations.ApiStatus
 
+@OptIn(ExperimentalSerializationApi::class)
 @ApiStatus.Internal
 @PublishedApi
 internal fun <R> UNSAFE_deserialize(descriptorF: SerialDescriptor, ctor: (Array<Any?>)-> R, vararg serializers: KSerializer<*>): DeserializationStrategy<R> = object: DeserializationStrategy<R> {
@@ -24,7 +25,9 @@ internal fun <R> UNSAFE_deserialize(descriptorF: SerialDescriptor, ctor: (Array<
 
         val missing = mutableListOf<String>()
         for ((i, field )in fields.withIndex()) {
-            if (field == null) missing += descriptor.getElementName(i)
+            val descriptor = descriptor.getElementDescriptor(i)
+            if (descriptor.isNullable) continue
+            if (field == null) missing += descriptor.serialName
         }
         if (missing.isNotEmpty()) throw MissingFieldException(missing, descriptor.serialName)
 

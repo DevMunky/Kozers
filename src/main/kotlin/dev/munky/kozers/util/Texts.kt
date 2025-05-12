@@ -1,7 +1,9 @@
 package dev.munky.kozers.util
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -31,6 +33,8 @@ fun miniText(content: String) = DEFAULT_MINIMESSAGE.deserialize(content)
 val String.asComponent: Component get() = miniText(this)
 
 val Component.asString: String get() = PlainTextComponentSerializer.plainText().serialize(this)
+
+val Component.asMini: String get() = DEFAULT_MINIMESSAGE.serialize(this)
 
 // I made this really quick im so smart
 fun String.toSnakeCase(): String {
