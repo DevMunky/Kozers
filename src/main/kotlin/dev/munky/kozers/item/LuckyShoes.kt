@@ -27,7 +27,7 @@ object LuckyShoes : KItem() {
         )
     }
 
-    private val LUCK_MODIFIER = AttributeModifier(NamespacedKey("kozers", "luck.boots"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET)
+    private val LUCK_MODIFIER = AttributeModifier(NamespacedKey("kozers", "armor.boots.luck"), 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET)
     private val ARMOR_MODIFIER = AttributeModifier(NamespacedKey.minecraft("armor.boots"), 1.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET)
 
     override fun transform0(item: ItemStack): ItemStack {
